@@ -15,7 +15,7 @@ pub type Button<'a, Message> = Builder<'a, Message, Image<'a, Handle, Message>>;
 /// A button constructed from an image handle, using image button styling.
 pub fn image<'a, Message>(handle: impl Into<Handle> + 'a) -> Button<'a, Message> {
     Button::new(Image {
-        image: widget::image(handle).border_radius([9.0; 4]),
+        image: widget::image(handle),
         selected: false,
         on_remove: None,
     })
@@ -97,5 +97,94 @@ where
         }
 
         button.into()
+    }
+}
+
+#[cfg(all(test, feature = "wgpu", feature = "tokio"))]
+mod tests {
+    use super::*;
+    use crate::iced::advanced::renderer::{Headless, Renderer as _};
+    use crate::iced::advanced::{Layout, layout, mouse, renderer, widget::Tree};
+    use crate::iced::border::{Outline, Shape};
+    use crate::iced::{Color, Font, Pixels, Rectangle, Size};
+
+    #[test]
+    fn image_button_content_matches_its_theme_contour() {
+        check("tiny-skia");
+    }
+
+    #[test]
+    #[ignore = "requires a GPU or software Vulkan adapter"]
+    fn gpu_image_button_content_matches_its_theme_contour() {
+        check("wgpu");
+    }
+
+    fn check(backend: &str) {
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        let mut renderer = runtime
+            .block_on(<crate::Renderer as Headless>::new(
+                Font::default(),
+                Pixels(14.0),
+                Some(backend),
+            ))
+            .unwrap();
+        let bounds = Rectangle::with_size(Size::new(100.0, 100.0));
+
+        for shape in [Shape::Circular, Shape::Continuous] {
+            let theme = crate::Theme::dark().corner_shape(shape);
+            let handle = crate::iced::widget::image::Handle::from_rgba(100, 100, vec![255; 40000]);
+            let mut view: crate::Element<'_, ()> = image(handle)
+                .width(Length::Fixed(100.0))
+                .height(Length::Fixed(100.0))
+                .on_press(())
+                .into();
+            let mut tree = Tree::new(view.as_widget());
+            let node = view.as_widget_mut().layout(
+                &mut tree,
+                &renderer,
+                &layout::Limits::new(Size::ZERO, bounds.size()),
+            );
+            let outline = Outline::new(
+                [0.0, 0.0, 100.0, 100.0],
+                theme.cosmic().radius_s().map(f64::from),
+                shape,
+            )
+            .unwrap();
+
+            for scale in [1.0f32, 1.25, 1.5] {
+                renderer.reset(bounds);
+                view.as_widget().draw(
+                    &tree,
+                    &mut renderer,
+                    &theme,
+                    &renderer::Style {
+                        text_color: Color::WHITE,
+                        icon_color: Color::WHITE,
+                        scale_factor: scale as f64,
+                    },
+                    Layout::new(&node),
+                    mouse::Cursor::Unavailable,
+                    &bounds,
+                );
+                let size = Size::new((100.0 * scale) as u32, (100.0 * scale) as u32);
+                let pixels = Headless::screenshot(&mut renderer, size, scale, Color::TRANSPARENT);
+                let reference = outline.transformed([0.0; 2], scale as f64).unwrap();
+
+                for y in 0..size.height {
+                    for x in 0..size.width {
+                        let d = reference.signed_distance([x as f64 + 0.5, y as f64 + 0.5]);
+                        let expected = (0.5 - d).clamp(0.0, 1.0);
+                        let actual = pixels[((y * size.width + x) * 4 + 3) as usize] as f64 / 255.0;
+                        assert!(
+                            (actual - expected).abs() <= 2.0 / 255.0,
+                            "{backend} {shape:?} scale={scale} pixel=({x},{y}) alpha={actual} reference={expected}"
+                        );
+                    }
+                }
+            }
+        }
     }
 }

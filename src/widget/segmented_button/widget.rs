@@ -2054,6 +2054,7 @@ where
                         bounds: tab_bounds,
                         border: Border {
                             radius: theme.cosmic().radius_s().into(),
+                            shape: background_appearance.first.border.shape,
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
@@ -2103,6 +2104,7 @@ where
                         bounds: tab_bounds,
                         border: Border {
                             radius: theme.cosmic().radius_s().into(),
+                            shape: background_appearance.last.border.shape,
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
@@ -2317,8 +2319,7 @@ where
                             Border {
                                 width: 1.0,
                                 color: appearance.active.text_color,
-                                radius: button_appearance.border.radius,
-                                ..Default::default()
+                                ..button_appearance.border
                             }
                         } else {
                             button_appearance.border
@@ -2815,6 +2816,123 @@ mod tests {
     use iced::Size;
     use slotmap::SecondaryMap;
     use std::collections::HashSet;
+
+    #[cfg(all(feature = "wgpu", feature = "tokio"))]
+    #[test]
+    fn focused_segment_keeps_its_shape_and_reference_inset() {
+        check_focused_segment("tiny-skia");
+    }
+
+    #[cfg(all(feature = "wgpu", feature = "tokio"))]
+    #[test]
+    #[ignore = "requires a GPU or software Vulkan adapter"]
+    fn gpu_focused_segment_keeps_its_shape_and_reference_inset() {
+        check_focused_segment("wgpu");
+    }
+
+    #[cfg(all(feature = "wgpu", feature = "tokio"))]
+    fn check_focused_segment(backend: &str) {
+        use iced_core::border::{Outline, Shape};
+        use iced_core::renderer::Headless;
+        use iced_core::{Font, Pixels};
+        let runtime = tokio::runtime::Builder::new_current_thread()
+            .enable_all()
+            .build()
+            .unwrap();
+        let mut renderer = runtime
+            .block_on(<crate::Renderer as Headless>::new(
+                Font::default(),
+                Pixels(14.0),
+                Some(backend),
+            ))
+            .unwrap();
+        let mut key = Entity::null();
+        let model: segmented_button::SingleSelectModel = segmented_button::Model::builder()
+            .insert(|b| b.text("").with_id(|id| key = id))
+            .build();
+        let bounds = Rectangle::with_size(Size::new(80.0, 40.0));
+
+        for shape in [Shape::Circular, Shape::Continuous] {
+            let reference = Outline::new([-4.0, -4.0, 88.0, 48.0], [12.0; 4], shape)
+                .unwrap()
+                .inset(4.0)
+                .unwrap();
+            let item = segmented_button::ItemAppearance {
+                border: Border {
+                    radius: 12.0.into(),
+                    shape,
+                    outline: Some(reference),
+                    ..Default::default()
+                },
+            };
+            let status = segmented_button::ItemStatusAppearance {
+                first: item,
+                middle: item,
+                last: item,
+                background: Some(Color::from_rgba(1.0, 1.0, 1.0, 0.5).into()),
+                text_color: Color::WHITE,
+            };
+            let appearance = SegAppearance {
+                active: status,
+                inactive: status,
+                hover: status,
+                pressed: status,
+                ..Default::default()
+            };
+            let mut view = segmented_button::horizontal(&model)
+                .on_activate(|_| ())
+                .width(Length::Fixed(80.0))
+                .height(Length::Fixed(40.0))
+                .button_height(40)
+                .button_padding([0; 4])
+                .style(Style::Custom(Box::new(move |_| appearance)));
+            let mut tree = Tree::new(&view as &dyn Widget<(), crate::Theme, crate::Renderer>);
+            let node = view.layout(
+                &mut tree,
+                &renderer,
+                &layout::Limits::new(Size::ZERO, bounds.size()),
+            );
+            let state = tree.state.downcast_mut::<LocalState>();
+            state.set_focused();
+            state.focused_visible = true;
+            state.focused_item = Item::Tab(key);
+            let theme = crate::Theme::dark().corner_shape(shape);
+
+            for scale in [1.0f32, 1.25, 1.5] {
+                renderer.reset(bounds);
+                view.draw(
+                    &tree,
+                    &mut renderer,
+                    &theme,
+                    &renderer::Style {
+                        text_color: Color::WHITE,
+                        icon_color: Color::WHITE,
+                        scale_factor: scale as f64,
+                    },
+                    Layout::new(&node),
+                    mouse::Cursor::Unavailable,
+                    &bounds,
+                );
+                let size = Size::new((80.0 * scale) as u32, (40.0 * scale) as u32);
+                let pixels = Headless::screenshot(&mut renderer, size, scale, Color::TRANSPARENT);
+                let reference = reference.transformed([0.0; 2], scale as f64).unwrap();
+
+                for y in 0..size.height {
+                    for x in 0..size.width {
+                        let d = reference.signed_distance([x as f64 + 0.5, y as f64 + 0.5]);
+                        let outer = (0.5 - d).clamp(0.0, 1.0);
+                        let inner = (0.5 - d - scale as f64).clamp(0.0, 1.0);
+                        let expected = inner * 0.5 + (outer - inner);
+                        let actual = pixels[((y * size.width + x) * 4 + 3) as usize] as f64 / 255.0;
+                        assert!(
+                            (actual - expected).abs() <= 2.0 / 255.0,
+                            "{backend} focused {shape:?} scale={scale} pixel=({x},{y}) alpha={actual} reference={expected}"
+                        );
+                    }
+                }
+            }
+        }
+    }
 
     #[derive(Clone, Debug)]
     enum TestMessage {}

@@ -377,6 +377,7 @@ impl Context {
                         text_color: Some(cosmic.background(theme.transparent).on.into()),
                         background: Some(Color::from(bg).into()),
                         border: iced::Border {
+                            shape: theme.corner_shape,
                             radius: corners.radius_m.into(),
                             width: 1.0,
                             color: cosmic.background(theme.transparent).divider.into(),

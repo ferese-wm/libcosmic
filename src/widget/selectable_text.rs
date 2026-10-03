@@ -299,6 +299,7 @@ impl<'a, Message: Clone + 'static> Widget<Message, crate::Theme, Renderer> for S
                 renderer::Quad {
                     bounds: layout.bounds(),
                     border: iced_core::Border {
+                        shape: theme.corner_shape,
                         color: accent,
                         width: 1.0,
                         radius: cosmic.corner_radii.radius_s.into(),

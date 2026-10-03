@@ -833,6 +833,7 @@ impl<App: Application> ApplicationExt for App {
                                         cosmic.background(theme.transparent).base.into(),
                                     )),
                                     border: iced::Border {
+                                        shape: theme.corner_shape,
                                         radius: [
                                             (window_corner_radius[0] - 1.0).max(0.0),
                                             (window_corner_radius[1] - 1.0).max(0.0),
@@ -865,6 +866,7 @@ impl<App: Application> ApplicationExt for App {
                         None
                     },
                     border: iced::Border {
+                        shape: theme.corner_shape,
                         color: theme.cosmic().bg_divider().into(),
                         width: if maximized { 0.0 } else { 1.0 },
                         radius: window_corner_radius.into(),

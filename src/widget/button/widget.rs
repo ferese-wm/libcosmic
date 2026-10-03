@@ -909,6 +909,25 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
 ) where
     Theme: super::style::Catalog,
 {
+    let draw_contents = |renderer: &mut Renderer, styling: &Style| {
+        if is_image {
+            let border = Border {
+                radius: styling.border_radius,
+                shape: styling.shape.unwrap_or_default(),
+                outline: styling.outline,
+                ..Default::default()
+            };
+
+            if let Some(outline) = border.outline_for(bounds) {
+                renderer.with_shaped_layer(bounds, outline, |renderer| {
+                    draw_contents(renderer, styling)
+                });
+            }
+        } else {
+            draw_contents(renderer, styling);
+        }
+    };
+
     let doubled_border_width = styling.border_width * 2.0;
     let doubled_outline_width = styling.outline_width * 2.0;
 
