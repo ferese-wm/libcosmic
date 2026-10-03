@@ -139,6 +139,8 @@ pub fn draw(renderer: &mut crate::Renderer, handle: &Handle, icon_bounds: Rectan
                     filter_method: iced_core::image::FilterMethod::Linear,
                     rotation: Radians(0.),
                     border_radius: [0.0; 4].into(),
+                    shape: iced_core::border::Shape::Circular,
+                    outline: None,
                     opacity: 1.0,
                     snap: true,
                 },
