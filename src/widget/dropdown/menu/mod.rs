@@ -291,6 +291,7 @@ impl<'a, Message: Clone + 'a> Overlay<'a, Message> {
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or(theme.corner_shape),
                     ..Default::default()
                 },
                 shadow: Shadow::default(),
@@ -620,6 +621,7 @@ where
                         },
                         border: Border {
                             radius: appearance.border_radius,
+                            shape: appearance.shape.unwrap_or(theme.corner_shape),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
@@ -655,6 +657,7 @@ where
                         },
                         border: Border {
                             radius: appearance.border_radius,
+                            shape: appearance.shape.unwrap_or(theme.corner_shape),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),

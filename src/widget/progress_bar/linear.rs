@@ -267,6 +267,7 @@ where
                 let segment_radius = [r_left, r_right, r_right, r_left].into();
 
                 let border = Border {
+                    shape: custom_style.shape,
                     width: border_width,
                     color: border_color,
                     radius: segment_radius,
@@ -298,6 +299,7 @@ where
                 renderer,
                 bounds,
                 Border {
+                    shape: custom_style.shape,
                     width: border_width,
                     color: border_color,
                     radius: radius.into(),
@@ -316,6 +318,7 @@ where
             let right_width = (1.0 - start).min(length);
             let left_width = length - right_width;
             let border = Border {
+                shape: custom_style.shape,
                 radius: radius.into(),
                 ..Border::default()
             };

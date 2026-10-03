@@ -1197,6 +1197,7 @@ fn draw_drag_backdrop(renderer: &mut Renderer, theme: &crate::Theme, bounds: Rec
         renderer::Quad {
             bounds,
             border: Border {
+                shape: theme.corner_shape,
                 radius: cosmic.corner_radii.radius_m.into(),
                 ..Border::default()
             },

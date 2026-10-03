@@ -292,6 +292,7 @@ fn container_style(theme: &crate::Theme) -> iced_widget::container::Style {
     let current_container = theme.current_container();
     let border = if theme.theme_type.is_high_contrast() {
         Border {
+            shape: theme.corner_shape,
             radius: corners.radius_s.into(),
             width: 1.,
             color: current_container.component.border.into(),
@@ -299,6 +300,7 @@ fn container_style(theme: &crate::Theme) -> iced_widget::container::Style {
         }
     } else {
         Border {
+            shape: theme.corner_shape,
             radius: corners.radius_s.into(),
             width: 0.0,
             color: accent.base.into(),

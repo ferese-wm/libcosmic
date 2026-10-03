@@ -437,6 +437,7 @@ where
                     Quad {
                         bounds: layout.bounds(),
                         border: Border {
+                            shape: theme.corner_shape,
                             radius: Radius::from([0.0, 0.0, radius_xs[2], radius_xs[3]]),
                             ..Default::default()
                         },

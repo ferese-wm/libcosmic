@@ -2669,6 +2669,8 @@ pub fn draw<'a, Message>(
                 bounds,
                 border: Border {
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or_else(|| theme.corner_shape()),
+                    outline: appearance.outline,
                     width: appearance.border_width,
                     ..Default::default()
                 },
@@ -2688,6 +2690,10 @@ pub fn draw<'a, Message>(
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or_else(|| theme.corner_shape()),
+                    outline: appearance
+                        .outline
+                        .and_then(|outline| outline.inset(-f64::from(border_offset))),
                     ..Default::default()
                 },
                 shadow: Shadow {
@@ -2707,6 +2713,8 @@ pub fn draw<'a, Message>(
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or_else(|| theme.corner_shape()),
+                    outline: appearance.outline,
                     ..Default::default()
                 },
                 shadow: Shadow {

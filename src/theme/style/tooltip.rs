@@ -9,6 +9,9 @@ pub enum Tooltip {
 }
 
 impl Catalog for crate::Theme {
+    fn corner_shape(&self) -> iced_core::border::Shape {
+        self.corner_shape
+    }
     type Class = Tooltip;
 
     fn style(&self, style: &Self::Class) -> crate::widget::wayland::tooltip::Style {
@@ -16,6 +19,8 @@ impl Catalog for crate::Theme {
 
         match style {
             Tooltip::Default => crate::widget::wayland::tooltip::Style {
+                shape: Some(self.corner_shape),
+                outline: None,
                 text_color: cosmic.on_bg_color().into(),
                 background: None,
                 border_width: 0.0,

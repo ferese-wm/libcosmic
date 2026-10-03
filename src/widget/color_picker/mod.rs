@@ -849,6 +849,8 @@ pub fn color_button<'a, Message: Clone + 'static>(
             };
             let standard = theme.active(focused, false, &Button::Standard);
             button::Style {
+                shape: None,
+                outline: None,
                 shadow_offset: Vector::default(),
                 background: color.map(Background::from).or(standard.background),
                 border_radius: cosmic.radius_xs().into(),
@@ -866,6 +868,8 @@ pub fn color_button<'a, Message: Clone + 'static>(
 
             let standard = theme.disabled(&Button::Standard);
             button::Style {
+                shape: None,
+                outline: None,
                 shadow_offset: Vector::default(),
                 background: color.map(Background::from).or(standard.background),
                 border_radius: cosmic.radius_xs().into(),
@@ -889,6 +893,8 @@ pub fn color_button<'a, Message: Clone + 'static>(
 
             let standard = theme.hovered(focused, false, &Button::Standard);
             button::Style {
+                shape: None,
+                outline: None,
                 shadow_offset: Vector::default(),
                 background: color.map(Background::from).or(standard.background),
                 border_radius: cosmic.radius_xs().into(),
@@ -912,6 +918,8 @@ pub fn color_button<'a, Message: Clone + 'static>(
 
             let standard = theme.pressed(focused, false, &Button::Standard);
             button::Style {
+                shape: None,
+                outline: None,
                 shadow_offset: Vector::default(),
                 background: color.map(Background::from).or(standard.background),
                 border_radius: cosmic.radius_xs().into(),

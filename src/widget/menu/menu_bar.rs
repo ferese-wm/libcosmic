@@ -740,6 +740,7 @@ where
                         bounds: active_bounds,
                         border: Border {
                             radius: styling.bar_border_radius.into(),
+                            shape: styling.shape.unwrap_or(theme.corner_shape),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),

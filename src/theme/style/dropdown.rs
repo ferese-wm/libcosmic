@@ -12,6 +12,7 @@ impl dropdown::menu::StyleSheet for Theme {
         let cosmic = self.cosmic();
 
         dropdown::menu::Appearance {
+            shape: Some(self.corner_shape),
             text_color: cosmic.on_bg_color().into(),
             background: Background::Color(
                 cosmic.background(self.transparent).component.base.into(),

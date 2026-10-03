@@ -301,7 +301,8 @@ impl<'a, Message: 'static + Clone, TopLevelMessage: 'static + Clone>
         }
         let content_layout = layout.children().next().unwrap();
 
-        let styling = theme.style(&self.style);
+        let mut styling = theme.style(&self.style);
+        styling.shape = Some(styling.shape.unwrap_or_else(|| theme.corner_shape()));
 
         let icon_color = styling.icon_color.unwrap_or(renderer_style.icon_color);
 
@@ -611,6 +612,10 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     width: styling.outline_width,
                     color: styling.outline_color,
                     radius: styling.border_radius,
+                    shape: styling.shape.unwrap_or_default(),
+                    outline: styling.outline.and_then(|outline| {
+                        outline.inset(-f64::from(styling.border_width + styling.outline_width))
+                    }),
                     ..Default::default()
                 },
                 shadow: Shadow::default(),
@@ -633,6 +638,16 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline.and_then(|outline| {
+                            outline.transformed(
+                                [
+                                    styling.shadow_offset.x as f64,
+                                    styling.shadow_offset.y as f64,
+                                ],
+                                1.0,
+                            )
+                        }),
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
@@ -649,6 +664,8 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     bounds,
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
@@ -673,6 +690,8 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                         width: styling.border_width,
                         color: styling.border_color,
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),

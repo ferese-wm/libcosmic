@@ -375,6 +375,7 @@ impl<'a, Message> Widget<Message, crate::Theme, crate::Renderer> for Toggler<'a,
                 bounds: toggler_background_bounds,
                 border: Border {
                     radius: style.border_radius,
+                    shape: style.shape,
                     ..Default::default()
                 },
                 ..renderer::Quad::default()
@@ -401,6 +402,7 @@ impl<'a, Message> Widget<Message, crate::Theme, crate::Renderer> for Toggler<'a,
                 bounds: toggler_foreground_bounds,
                 border: Border {
                     radius: style.handle_radius,
+                    shape: style.shape,
                     ..Default::default()
                 },
                 ..renderer::Quad::default()

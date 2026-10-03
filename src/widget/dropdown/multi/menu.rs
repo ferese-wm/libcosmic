@@ -253,6 +253,7 @@ impl<Message> iced_core::Overlay<Message, crate::Theme, crate::Renderer> for Ove
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or(theme.corner_shape),
                     ..Default::default()
                 },
                 shadow: Shadow::default(),
@@ -533,6 +534,7 @@ where
                                 bounds,
                                 border: Border {
                                     radius: appearance.border_radius,
+                                    shape: appearance.shape.unwrap_or(theme.corner_shape),
                                     ..Default::default()
                                 },
                                 shadow: Shadow::default(),
@@ -570,6 +572,7 @@ where
                                 bounds,
                                 border: Border {
                                     radius: appearance.border_radius,
+                                    shape: appearance.shape.unwrap_or(theme.corner_shape),
                                     ..Default::default()
                                 },
                                 shadow: Shadow::default(),

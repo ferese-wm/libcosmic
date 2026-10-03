@@ -472,6 +472,8 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
 
             theme.active(state.is_focused, self.selected, &self.style)
         };
+
+        styling.shape = Some(styling.shape.unwrap_or_else(|| theme.corner_shape()));
         if matches!(
             self.style,
             crate::theme::Button::MenuItem | crate::theme::Button::MenuFolder
@@ -548,6 +550,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                                 y: bounds.y + (bounds.height - 20.0 - styling.border_width),
                             },
                             border: Border {
+                                shape: styling.shape.unwrap_or_default(),
                                 radius: [
                                     c_rad.radius_0[0],
                                     c_rad.radius_s[1],
@@ -586,6 +589,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                                     shadow: Shadow::default(),
                                     border: Border {
                                         radius: c_rad.radius_m.into(),
+                                        shape: styling.shape.unwrap_or_default(),
                                         ..Default::default()
                                     },
                                     snap: true,
@@ -921,6 +925,10 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     width: styling.outline_width,
                     color: styling.outline_color,
                     radius: styling.border_radius,
+                    shape: styling.shape.unwrap_or_default(),
+                    outline: styling.outline.and_then(|outline| {
+                        outline.inset(-f64::from(styling.border_width + styling.outline_width))
+                    }),
                     ..Default::default()
                 },
                 shadow: Shadow::default(),
@@ -943,6 +951,16 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline.and_then(|outline| {
+                            outline.transformed(
+                                [
+                                    styling.shadow_offset.x as f64,
+                                    styling.shadow_offset.y as f64,
+                                ],
+                                1.0,
+                            )
+                        }),
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
@@ -959,6 +977,8 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     bounds,
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
@@ -975,6 +995,8 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     bounds,
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
@@ -1000,6 +1022,8 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                         width: styling.border_width,
                         color: styling.border_color,
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),

@@ -86,6 +86,7 @@ impl iced_button::Catalog for Theme {
                 _ => corner_radii.radius_xl.into(),
             },
             border: Border {
+                shape: self.corner_shape,
                 radius: match class {
                     Button::Link => corner_radii.radius_0.into(),
                     Button::Card => corner_radii.radius_xs.into(),
@@ -213,6 +214,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.accent.on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -234,6 +236,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.background(self.transparent).on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: cosmic.palette.neutral_8.into(),
@@ -249,6 +252,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.success.on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -269,6 +273,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.destructive.on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -311,6 +316,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.accent.on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -331,6 +337,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: self.current_container().on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -351,6 +358,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.success.on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -371,6 +379,7 @@ impl iced_checkbox::Catalog for Theme {
                         }),
                         icon_color: cosmic.destructive.on.into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: if is_checked {
@@ -492,7 +501,7 @@ impl iced_container::Catalog for Theme {
         // Ensures visually aligned radii for content and window corners
         let window_corner_radius = cosmic.radius_s().map(|x| if x < 4.0 { x } else { x + 4.0 });
 
-        match class {
+        let mut appearance = match class {
             Container::Transparent => {
                 let component = &self.current_container().component;
 
@@ -501,6 +510,7 @@ impl iced_container::Catalog for Theme {
                     text_color: Some(component.on.into()),
                     background: None,
                     border: Border {
+                        shape: self.corner_shape,
                         radius: 0.into(),
                         ..Default::default()
                     },
@@ -509,7 +519,7 @@ impl iced_container::Catalog for Theme {
                 }
             }
 
-            Container::Custom(f) => f(self),
+            Container::Custom(f) => return f(self),
 
             Container::WindowBackground => iced_container::Style {
                 icon_color: Some(Color::from(cosmic.background(self.transparent).on)),
@@ -518,6 +528,7 @@ impl iced_container::Catalog for Theme {
                     cosmic.background(self.transparent).base.into(),
                 )),
                 border: Border {
+                    shape: self.corner_shape,
                     radius: [
                         cosmic.corner_radii.radius_0[0],
                         cosmic.corner_radii.radius_0[1],
@@ -538,6 +549,7 @@ impl iced_container::Catalog for Theme {
                     text_color: Some(component.on.into()),
                     background: Some(Background::Color(component.base.into())),
                     border: iced::Border {
+                        shape: self.corner_shape,
                         radius: cosmic.corner_radii.radius_s.into(),
                         ..Default::default()
                     },
@@ -575,6 +587,7 @@ impl iced_container::Catalog for Theme {
                         ))
                     },
                     border: Border {
+                        shape: self.corner_shape,
                         radius: [
                             if *sharp_corners {
                                 cosmic.corner_radii.radius_0[0]
@@ -618,6 +631,7 @@ impl iced_container::Catalog for Theme {
                 text_color: None,
                 background: Some(iced::Background::Color(cosmic.bg_component_color().into())),
                 border: Border {
+                    shape: self.corner_shape,
                     color: cosmic.bg_component_divider().into(),
                     width: 1.0,
                     radius: cosmic.corner_radii.radius_s.into(),
@@ -632,6 +646,7 @@ impl iced_container::Catalog for Theme {
                 text_color: None,
                 background: Some(iced::Background::Color(cosmic.palette.neutral_2.into())),
                 border: Border {
+                    shape: self.corner_shape,
                     radius: cosmic.corner_radii.radius_l.into(),
                     ..Default::default()
                 },
@@ -654,6 +669,7 @@ impl iced_container::Catalog for Theme {
                             cosmic.background(self.transparent).component.base.into(),
                         )),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -671,6 +687,7 @@ impl iced_container::Catalog for Theme {
                             cosmic.primary(self.transparent).component.base.into(),
                         )),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -688,6 +705,7 @@ impl iced_container::Catalog for Theme {
                             cosmic.secondary(self.transparent).component.base.into(),
                         )),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -704,6 +722,7 @@ impl iced_container::Catalog for Theme {
                     cosmic.primary(self.transparent && !is_overlay).base.into(),
                 )),
                 border: Border {
+                    shape: self.corner_shape,
                     color: cosmic
                         .primary(self.transparent && !is_overlay)
                         .divider
@@ -719,7 +738,9 @@ impl iced_container::Catalog for Theme {
                 },
                 snap: true,
             },
-        }
+        };
+        appearance.border.shape = self.corner_shape;
+        appearance
     }
 }
 
@@ -772,6 +793,7 @@ impl slider::Catalog for Theme {
                             Background::Color(inactive_track.into()),
                         ),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_xs.into(),
                             color: if hc && !is_dark {
                                 self.current_container().component.border.into()
@@ -785,6 +807,7 @@ impl slider::Catalog for Theme {
                     },
 
                     handle: slider::Handle {
+                        corner_shape: self.corner_shape,
                         shape: slider::HandleShape::Rectangle {
                             height: 26,
                             width: 26,
@@ -836,6 +859,7 @@ impl menu::Catalog for Theme {
             text_color: cosmic.on_bg_color().into(),
             background: Background::Color(cosmic.background(self.transparent).base.into()),
             border: Border {
+                shape: self.corner_shape,
                 radius: cosmic.corner_radii.radius_m.into(),
                 ..Default::default()
             },
@@ -865,6 +889,7 @@ impl pick_list::Catalog for Theme {
             background: Color::TRANSPARENT.into(),
             placeholder_color: cosmic.on_bg_color().into(),
             border: Border {
+                shape: self.corner_shape,
                 radius: cosmic.corner_radii.radius_m.into(),
                 width: if hc { 1. } else { 0. },
                 color: if hc {
@@ -956,6 +981,7 @@ impl toggler::Catalog for Theme {
         let neutral_10 = cosmic.palette.neutral_10.with_alpha(0.1);
 
         let mut active = toggler::Style {
+            shape: self.corner_shape,
             background: if matches!(status, toggler::Status::Active { is_toggled: true }) {
                 cosmic.accent.base.into()
             } else if cosmic.is_dark {
@@ -1022,6 +1048,7 @@ impl pane_grid::Catalog for Theme {
             hovered_region: Highlight {
                 background: Background::Color(theme.bg_color().into()),
                 border: Border {
+                    shape: self.corner_shape,
                     radius: theme.corner_radii.radius_0.into(),
                     width: 2.0,
                     color: theme.bg_divider().into(),
@@ -1084,6 +1111,7 @@ impl progress_bar::Catalog for Theme {
             )
         };
         let border = Border {
+            shape: self.corner_shape,
             radius: theme.corner_radii.radius_xl.into(),
             color: if theme.is_high_contrast && !theme.is_dark {
                 self.current_container().component.border.into()
@@ -1198,6 +1226,7 @@ impl scrollable::Catalog for Theme {
                     container: iced_container::transparent(self),
                     vertical_rail: scrollable::Rail {
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -1209,6 +1238,7 @@ impl scrollable::Catalog for Theme {
                                 neutral_5.into()
                             },
                             border: Border {
+                                shape: self.corner_shape,
                                 radius: cosmic.corner_radii.radius_s.into(),
                                 ..Default::default()
                             },
@@ -1216,6 +1246,7 @@ impl scrollable::Catalog for Theme {
                     },
                     horizontal_rail: scrollable::Rail {
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -1227,6 +1258,7 @@ impl scrollable::Catalog for Theme {
                                 neutral_5.into()
                             },
                             border: Border {
+                                shape: self.corner_shape,
                                 radius: cosmic.corner_radii.radius_s.into(),
                                 ..Default::default()
                             },
@@ -1266,6 +1298,7 @@ impl scrollable::Catalog for Theme {
                     container: iced_container::Style::default(),
                     vertical_rail: scrollable::Rail {
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -1277,6 +1310,7 @@ impl scrollable::Catalog for Theme {
                                 neutral_5.into()
                             },
                             border: Border {
+                                shape: self.corner_shape,
                                 radius: cosmic.corner_radii.radius_s.into(),
                                 ..Default::default()
                             },
@@ -1284,6 +1318,7 @@ impl scrollable::Catalog for Theme {
                     },
                     horizontal_rail: scrollable::Rail {
                         border: Border {
+                            shape: self.corner_shape,
                             radius: cosmic.corner_radii.radius_s.into(),
                             ..Default::default()
                         },
@@ -1295,6 +1330,7 @@ impl scrollable::Catalog for Theme {
                                 neutral_5.into()
                             },
                             border: Border {
+                                shape: self.corner_shape,
                                 radius: cosmic.corner_radii.radius_s.into(),
                                 ..Default::default()
                             },
@@ -1437,6 +1473,7 @@ impl text_input::Catalog for Theme {
             TextInput::Default => text_input::Style {
                 background: Color::from(bg).into(),
                 border: Border {
+                    shape: self.corner_shape,
                     radius: palette.corner_radii.radius_s.into(),
                     width: 1.0,
                     color: self.current_container().component.divider.into(),
@@ -1450,6 +1487,7 @@ impl text_input::Catalog for Theme {
             TextInput::Search => text_input::Style {
                 background: Color::from(bg).into(),
                 border: Border {
+                    shape: self.corner_shape,
                     radius: palette.corner_radii.radius_m.into(),
                     ..Default::default()
                 },
@@ -1469,6 +1507,7 @@ impl text_input::Catalog for Theme {
                     TextInput::Default => text_input::Style {
                         background: Color::from(bg).into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: palette.corner_radii.radius_s.into(),
                             width: 1.0,
                             color: self.current_container().on.into(),
@@ -1482,6 +1521,7 @@ impl text_input::Catalog for Theme {
                     TextInput::Search => text_input::Style {
                         background: Color::from(bg).into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: palette.corner_radii.radius_m.into(),
                             ..Default::default()
                         },
@@ -1499,6 +1539,7 @@ impl text_input::Catalog for Theme {
                     TextInput::Default => text_input::Style {
                         background: Color::from(bg).into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: palette.corner_radii.radius_s.into(),
                             width: 1.0,
                             color: palette.accent.base.into(),
@@ -1512,6 +1553,7 @@ impl text_input::Catalog for Theme {
                     TextInput::Search => text_input::Style {
                         background: Color::from(bg).into(),
                         border: Border {
+                            shape: self.corner_shape,
                             radius: palette.corner_radii.radius_m.into(),
                             ..Default::default()
                         },
@@ -1585,6 +1627,7 @@ impl iced_widget::text_editor::Catalog for Theme {
             | iced_widget::text_editor::Status::Disabled => iced_widget::text_editor::Style {
                 background: iced::Color::from(cosmic.bg_color()).into(),
                 border: Border {
+                    shape: self.corner_shape,
                     radius: cosmic.corner_radii.radius_0.into(),
                     width: f32::from(cosmic.space_xxxs()),
                     color: iced::Color::from(cosmic.bg_divider()),
@@ -1598,6 +1641,7 @@ impl iced_widget::text_editor::Catalog for Theme {
                 iced_widget::text_editor::Style {
                     background: iced::Color::from(cosmic.bg_color()).into(),
                     border: Border {
+                        shape: self.corner_shape,
                         radius: cosmic.corner_radii.radius_0.into(),
                         width: f32::from(cosmic.space_xxxs()),
                         color: iced::Color::from(cosmic.accent.base),

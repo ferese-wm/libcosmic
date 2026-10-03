@@ -14,6 +14,10 @@ use crate::theme::THEME;
 #[must_use]
 #[derive(Debug, Clone, Copy)]
 pub struct Style {
+    /// Corner profile override; None uses the theme preference.
+    pub shape: Option<iced_core::border::Shape>,
+    /// Reference contour for an explicitly concentric surface.
+    pub outline: Option<iced_core::border::Outline>,
     /// The amount of offset to apply to the shadow of the tooltip.
     pub shadow_offset: Vector,
 
@@ -47,6 +51,8 @@ impl Style {
     pub fn new() -> Self {
         let rad_0 = THEME.lock().unwrap().cosmic().corner_radii.radius_0;
         Self {
+            shape: None,
+            outline: None,
             shadow_offset: Vector::new(0.0, 0.0),
             background: None,
             border_radius: Radius::from(rad_0),
@@ -69,6 +75,11 @@ impl std::default::Default for Style {
 // TODO update to match other styles
 /// A set of rules that dictate the style of a tooltip.
 pub trait Catalog {
+    /// Default corner profile for styles without an explicit override.
+    fn corner_shape(&self) -> iced_core::border::Shape {
+        iced_core::border::Shape::Circular
+    }
+
     /// The supported style of the [`StyleSheet`].
     type Class: Default;
 

@@ -9,6 +9,8 @@ use iced_widget::core::Color;
 /// The appearance of a menu bar and its menus.
 #[derive(Debug, Clone, Copy)]
 pub struct Appearance {
+    /// Profile override for the bar and its menus.
+    pub shape: Option<iced_core::border::Shape>,
     /// The background color of the menu bar and its menus.
     pub background: Color,
     /// The border width of the menu bar and its menus.
@@ -69,6 +71,7 @@ impl StyleSheet for Theme {
 
         match style {
             MenuBarStyle::Default => Appearance {
+                shape: Some(self.corner_shape),
                 background: bg.into(),
                 border_width: 1.0,
                 bar_border_radius: cosmic.corner_radii.radius_xl,

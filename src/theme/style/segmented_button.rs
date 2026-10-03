@@ -34,7 +34,7 @@ impl StyleSheet for Theme {
     fn horizontal(&self, style: &Self::Style) -> Appearance {
         let cosmic = self.cosmic();
         let container = self.current_container();
-        match style {
+        let mut appearance = match style {
             SegmentedButton::Control => {
                 let rad_xl = cosmic.corner_radii.radius_xl;
                 let rad_0 = cosmic.corner_radii.radius_0;
@@ -81,15 +81,29 @@ impl StyleSheet for Theme {
 
             SegmentedButton::TabBar => horizontal::tab_bar(cosmic, container),
 
-            SegmentedButton::Custom(func) => func(self),
+            SegmentedButton::Custom(func) => return func(self),
+        };
+        appearance.border.shape = self.corner_shape;
+
+        for status in [
+            &mut appearance.active,
+            &mut appearance.inactive,
+            &mut appearance.hover,
+            &mut appearance.pressed,
+        ] {
+            for item in [&mut status.first, &mut status.middle, &mut status.last] {
+                item.border.shape = self.corner_shape;
+            }
         }
+
+        appearance
     }
 
     #[allow(clippy::too_many_lines)]
     fn vertical(&self, style: &Self::Style) -> Appearance {
         let cosmic = self.cosmic();
         let container = self.current_container();
-        match style {
+        let mut appearance = match style {
             SegmentedButton::Control => {
                 let rad_xl = cosmic.corner_radii.radius_xl;
                 let rad_0 = cosmic.corner_radii.radius_0;
@@ -136,8 +150,22 @@ impl StyleSheet for Theme {
 
             SegmentedButton::TabBar => vertical::tab_bar(cosmic, container),
 
-            SegmentedButton::Custom(func) => func(self),
+            SegmentedButton::Custom(func) => return func(self),
+        };
+        appearance.border.shape = self.corner_shape;
+
+        for status in [
+            &mut appearance.active,
+            &mut appearance.inactive,
+            &mut appearance.hover,
+            &mut appearance.pressed,
+        ] {
+            for item in [&mut status.first, &mut status.middle, &mut status.last] {
+                item.border.shape = self.corner_shape;
+            }
         }
+
+        appearance
     }
 }
 
