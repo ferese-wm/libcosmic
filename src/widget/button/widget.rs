@@ -918,11 +918,9 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                 ..Default::default()
             };
 
-            if let Some(outline) = border.outline_for(bounds) {
-                renderer.with_shaped_layer(bounds, outline, |renderer| {
-                    draw_contents(renderer, styling)
-                });
-            }
+            renderer.with_border_layer(bounds, border, true, 0.0, |renderer| {
+                draw_contents(renderer, styling)
+            });
         } else {
             draw_contents(renderer, styling);
         }
