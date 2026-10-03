@@ -620,6 +620,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                 },
                 shadow: Shadow::default(),
                 snap: true,
+                use_contour: false,
             },
             Color::TRANSPARENT,
         );
@@ -652,6 +653,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: false,
                 },
                 Background::Color([0.0, 0.0, 0.0, 0.5].into()),
             );
@@ -670,6 +672,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: false,
                 },
                 background,
             );
@@ -696,6 +699,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: false,
                 },
                 Color::TRANSPARENT,
             );

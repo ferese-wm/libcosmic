@@ -513,6 +513,7 @@ pub fn draw<'a, S, Item: Clone + PartialEq + 'static>(
             border: style.border,
             shadow: Shadow::default(),
             snap: true,
+            use_contour: false,
         },
         style.background,
     );

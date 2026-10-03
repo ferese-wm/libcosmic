@@ -2029,6 +2029,7 @@ where
                     border: appearance.border,
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: false,
                 },
                 background,
             );
@@ -2059,6 +2060,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     background_appearance
                         .background
@@ -2109,6 +2111,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     background_appearance
                         .background
@@ -2165,6 +2168,7 @@ where
                             border: Border::default(),
                             shadow: Shadow::default(),
                             snap: true,
+                            use_contour: false,
                         },
                         {
                             let theme = crate::theme::active();
@@ -2256,6 +2260,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     appearance.active.text_color,
                 );
@@ -2295,6 +2300,7 @@ where
                                 },
                                 shadow: Shadow::default(),
                                 snap: true,
+                                use_contour: false,
                             },
                             divider_background,
                         );
@@ -2326,6 +2332,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     status_appearance
                         .background
@@ -3220,6 +3227,7 @@ fn draw_drop_indicator(
             },
             shadow: Shadow::default(),
             snap: true,
+            use_contour: false,
         },
         Background::Color(color),
     );

@@ -562,6 +562,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                             },
                             shadow: Shadow::default(),
                             snap: true,
+                            use_contour: false,
                         },
                         selection_background,
                     );
@@ -593,6 +594,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                                         ..Default::default()
                                     },
                                     snap: true,
+                                    use_contour: false,
                                 },
                                 selection_background,
                             );
@@ -950,6 +952,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                 },
                 shadow: Shadow::default(),
                 snap: true,
+                use_contour: is_image,
             },
             Color::TRANSPARENT,
         );
@@ -982,6 +985,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 Background::Color([0.0, 0.0, 0.0, 0.5].into()),
             );
@@ -1000,6 +1004,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 background,
             );
@@ -1018,6 +1023,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 overlay,
             );
@@ -1045,6 +1051,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 Color::TRANSPARENT,
             );

@@ -838,6 +838,7 @@ impl<'b, Message: Clone + 'static> Menu<'b, Message> {
                                 },
                                 shadow: Shadow::default(),
                                 snap: true,
+                                use_contour: false,
                             };
                             let menu_color = styling.background;
                             r.fill_quad(menu_quad, menu_color);
@@ -873,6 +874,7 @@ impl<'b, Message: Clone + 'static> Menu<'b, Message> {
                                     },
                                     shadow: Shadow::default(),
                                     snap: true,
+                                    use_contour: false,
                                 };
 
                                 r.fill_quad(path_quad, styling.path);

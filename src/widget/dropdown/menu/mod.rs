@@ -296,6 +296,7 @@ impl<'a, Message: Clone + 'a> Overlay<'a, Message> {
                 },
                 shadow: Shadow::default(),
                 snap: true,
+                use_contour: false,
             },
             appearance.background,
         );
@@ -626,6 +627,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     appearance.selected_background,
                 );
@@ -662,6 +664,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     appearance.hovered_background,
                 );

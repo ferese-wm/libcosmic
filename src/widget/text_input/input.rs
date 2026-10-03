@@ -2680,6 +2680,7 @@ pub fn draw<'a, Message>(
                     blur_radius: 0.0,
                 },
                 snap: true,
+                use_contour: false,
             },
             appearance.background,
         );
@@ -2702,6 +2703,7 @@ pub fn draw<'a, Message>(
                     blur_radius: 0.0,
                 },
                 snap: true,
+                use_contour: false,
             },
             Background::Color(Color::TRANSPARENT),
         );
@@ -2723,6 +2725,7 @@ pub fn draw<'a, Message>(
                     blur_radius: 0.0,
                 },
                 snap: true,
+                use_contour: false,
             },
             appearance.background,
         );
@@ -2830,6 +2833,7 @@ pub fn draw<'a, Message>(
                                     blur_radius: 0.0,
                                 },
                                 snap: true,
+                                use_contour: false,
                             },
                             text_color,
                         )],
@@ -2883,6 +2887,7 @@ pub fn draw<'a, Message>(
                                         blur_radius: 0.0,
                                     },
                                     snap: true,
+                                    use_contour: false,
                                 },
                                 appearance.selected_fill,
                             )

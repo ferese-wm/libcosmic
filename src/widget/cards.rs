@@ -443,6 +443,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     if i == 0 {
                         appearance.card_1

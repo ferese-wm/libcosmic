@@ -1207,6 +1207,7 @@ fn draw_drag_backdrop(renderer: &mut Renderer, theme: &crate::Theme, bounds: Rec
                 blur_radius: SHADOW_BLUR_RADIUS,
             },
             snap: true,
+            use_contour: false,
         },
         Background::Color(backdrop),
     );

@@ -634,6 +634,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     Color::TRANSPARENT,
                 );
@@ -653,6 +654,7 @@ where
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     Color::TRANSPARENT,
                 );
