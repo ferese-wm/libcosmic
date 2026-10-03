@@ -611,6 +611,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     width: styling.outline_width,
                     color: styling.outline_color,
                     radius: styling.border_radius,
+                    ..Default::default()
                 },
                 shadow: Shadow::default(),
                 snap: true,
@@ -672,6 +673,7 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                         width: styling.border_width,
                         color: styling.border_color,
                         radius: styling.border_radius,
+                        ..Default::default()
                     },
                     shadow: Shadow::default(),
                     snap: true,

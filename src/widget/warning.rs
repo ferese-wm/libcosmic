@@ -67,6 +67,7 @@ pub fn warning_container(theme: &Theme) -> widget::container::Style {
             color: Color::TRANSPARENT,
             width: 1.0,
             radius: cosmic.corner_radii.radius_0.into(),
+            ..Default::default()
         },
         shadow: Shadow {
             color: Color::TRANSPARENT,

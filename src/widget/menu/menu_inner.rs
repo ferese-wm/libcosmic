@@ -833,6 +833,7 @@ impl<'b, Message: Clone + 'static> Menu<'b, Message> {
                                     radius: styling.menu_border_radius.into(),
                                     width: styling.border_width,
                                     color: styling.border_color,
+                                    ..Default::default()
                                 },
                                 shadow: Shadow::default(),
                                 snap: true,

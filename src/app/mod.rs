@@ -868,6 +868,7 @@ impl<App: Application> ApplicationExt for App {
                         color: theme.cosmic().bg_divider().into(),
                         width: if maximized { 0.0 } else { 1.0 },
                         radius: window_corner_radius.into(),
+                        ..Default::default()
                     },
                     ..Default::default()
                 }

@@ -295,12 +295,14 @@ fn container_style(theme: &crate::Theme) -> iced_widget::container::Style {
             radius: corners.radius_s.into(),
             width: 1.,
             color: current_container.component.border.into(),
+            ..Default::default()
         }
     } else {
         Border {
             radius: corners.radius_s.into(),
             width: 0.0,
             color: accent.base.into(),
+            ..Default::default()
         }
     };
 

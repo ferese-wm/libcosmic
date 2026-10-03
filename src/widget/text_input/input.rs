@@ -2688,6 +2688,7 @@ pub fn draw<'a, Message>(
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    ..Default::default()
                 },
                 shadow: Shadow {
                     offset: Vector::new(0.0, 1.0),
@@ -2706,6 +2707,7 @@ pub fn draw<'a, Message>(
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    ..Default::default()
                 },
                 shadow: Shadow {
                     offset: Vector::new(0.0, 1.0),
@@ -2812,6 +2814,7 @@ pub fn draw<'a, Message>(
                                     width: 0.0,
                                     color: Color::TRANSPARENT,
                                     radius: radius_0,
+                                    ..Default::default()
                                 },
                                 shadow: Shadow {
                                     offset: Vector::ZERO,
@@ -2864,6 +2867,7 @@ pub fn draw<'a, Message>(
                                         width: 0.0,
                                         color: Color::TRANSPARENT,
                                         radius: radius_0,
+                                        ..Default::default()
                                     },
                                     shadow: Shadow {
                                         offset: Vector::ZERO,

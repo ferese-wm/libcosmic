@@ -221,6 +221,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
 
                         text_color: None,
@@ -236,6 +237,7 @@ impl iced_checkbox::Catalog for Theme {
                             radius: corners.radius_xs.into(),
                             width: if is_checked { 0.0 } else { 1.0 },
                             color: cosmic.palette.neutral_8.into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -255,6 +257,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -274,6 +277,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -315,6 +319,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -334,6 +339,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -353,6 +359,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -372,6 +379,7 @@ impl iced_checkbox::Catalog for Theme {
                                 cosmic.palette.neutral_8
                             }
                             .into(),
+                            ..Default::default()
                         },
                         text_color: None,
                     },
@@ -613,6 +621,7 @@ impl iced_container::Catalog for Theme {
                     color: cosmic.bg_component_divider().into(),
                     width: 1.0,
                     radius: cosmic.corner_radii.radius_s.into(),
+                    ..Default::default()
                 },
                 shadow: Shadow::default(),
                 snap: true,
@@ -701,6 +710,7 @@ impl iced_container::Catalog for Theme {
                         .into(),
                     width: 1.0,
                     radius: cosmic.corner_radii.radius_m.into(),
+                    ..Default::default()
                 },
                 shadow: Shadow {
                     color: cosmic.shade.into(),
@@ -769,6 +779,7 @@ impl slider::Catalog for Theme {
                                 Color::TRANSPARENT
                             },
                             width: if hc && !is_dark { 1. } else { 0. },
+                            ..Default::default()
                         },
                         width: 4.0,
                     },
@@ -861,6 +872,7 @@ impl pick_list::Catalog for Theme {
                 } else {
                     Color::TRANSPARENT
                 },
+                ..Default::default()
             },
             // icon_size: 0.7, // TODO: how to replace
             handle_color: cosmic.on_bg_color().into(),
@@ -1013,6 +1025,7 @@ impl pane_grid::Catalog for Theme {
                     radius: theme.corner_radii.radius_0.into(),
                     width: 2.0,
                     color: theme.bg_divider().into(),
+                    ..Default::default()
                 },
             },
             picked_split: pane_grid::Line {
@@ -1082,6 +1095,7 @@ impl progress_bar::Catalog for Theme {
             } else {
                 0.
             },
+            ..Default::default()
         };
         match class {
             ProgressBar::Primary => progress_bar::Style {
@@ -1426,6 +1440,7 @@ impl text_input::Catalog for Theme {
                     radius: palette.corner_radii.radius_s.into(),
                     width: 1.0,
                     color: self.current_container().component.divider.into(),
+                    ..Default::default()
                 },
                 icon: self.current_container().on.into(),
                 placeholder,
@@ -1457,6 +1472,7 @@ impl text_input::Catalog for Theme {
                             radius: palette.corner_radii.radius_s.into(),
                             width: 1.0,
                             color: self.current_container().on.into(),
+                            ..Default::default()
                         },
                         icon: self.current_container().on.into(),
                         placeholder,
@@ -1486,6 +1502,7 @@ impl text_input::Catalog for Theme {
                             radius: palette.corner_radii.radius_s.into(),
                             width: 1.0,
                             color: palette.accent.base.into(),
+                            ..Default::default()
                         },
                         icon: self.current_container().on.into(),
                         placeholder,
@@ -1571,6 +1588,7 @@ impl iced_widget::text_editor::Catalog for Theme {
                     radius: cosmic.corner_radii.radius_0.into(),
                     width: f32::from(cosmic.space_xxxs()),
                     color: iced::Color::from(cosmic.bg_divider()),
+                    ..Default::default()
                 },
                 placeholder,
                 value,
@@ -1583,6 +1601,7 @@ impl iced_widget::text_editor::Catalog for Theme {
                         radius: cosmic.corner_radii.radius_0.into(),
                         width: f32::from(cosmic.space_xxxs()),
                         color: iced::Color::from(cosmic.accent.base),
+                        ..Default::default()
                     },
                     placeholder,
                     value,

@@ -158,6 +158,7 @@ mod horizontal {
                 color: container.component.border.into(),
                 radius: cosmic.corner_radii.radius_0.into(),
                 width: 1.0,
+                ..Default::default()
             }
         } else {
             Border::default()
@@ -228,6 +229,7 @@ mod horizontal {
                     color: cosmic.accent.base.into(),
                     radius: Radius::from([rad_s[0], rad_s[1], rad_0[2], rad_0[3]]),
                     width: 0.0,
+                    ..Default::default()
                 },
             },
             middle: ItemAppearance {
@@ -235,6 +237,7 @@ mod horizontal {
                     color: cosmic.accent.base.into(),
                     radius: Radius::from([rad_s[0], rad_s[1], rad_0[2], rad_0[3]]),
                     width: 0.0,
+                    ..Default::default()
                 },
             },
             last: ItemAppearance {
@@ -242,6 +245,7 @@ mod horizontal {
                     color: cosmic.accent.base.into(),
                     radius: Radius::from([rad_s[0], rad_s[1], rad_0[2], rad_0[3]]),
                     width: 0.0,
+                    ..Default::default()
                 },
             },
             text_color: cosmic.accent_text_color().into(),

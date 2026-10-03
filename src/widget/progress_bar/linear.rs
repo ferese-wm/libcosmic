@@ -270,6 +270,7 @@ where
                     width: border_width,
                     color: border_color,
                     radius: segment_radius,
+                    ..Default::default()
                 };
 
                 // empty segment
@@ -300,6 +301,7 @@ where
                     width: border_width,
                     color: border_color,
                     radius: radius.into(),
+                    ..Default::default()
                 },
                 track_color,
             );

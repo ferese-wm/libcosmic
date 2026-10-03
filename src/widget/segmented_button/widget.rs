@@ -2318,6 +2318,7 @@ where
                                 width: 1.0,
                                 color: appearance.active.text_color,
                                 radius: button_appearance.border.radius,
+                                ..Default::default()
                             }
                         } else {
                             button_appearance.border

@@ -380,6 +380,7 @@ impl Context {
                             radius: corners.radius_m.into(),
                             width: 1.0,
                             color: cosmic.background(theme.transparent).divider.into(),
+                            ..Default::default()
                         },
                         shadow: Shadow::default(),
                         icon_color: Some(cosmic.background(theme.transparent).on.into()),

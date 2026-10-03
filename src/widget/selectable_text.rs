@@ -302,6 +302,7 @@ impl<'a, Message: Clone + 'static> Widget<Message, crate::Theme, Renderer> for S
                         color: accent,
                         width: 1.0,
                         radius: cosmic.corner_radii.radius_s.into(),
+                        ..Default::default()
                     },
                     ..renderer::Quad::default()
                 },

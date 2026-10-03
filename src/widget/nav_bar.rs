@@ -210,6 +210,7 @@ pub fn nav_bar_style(theme: &Theme) -> iced_widget::container::Style {
             width: 0.0,
             color: Color::TRANSPARENT,
             radius: cosmic.corner_radii.radius_s.into(),
+            ..Default::default()
         },
         shadow: Shadow::default(),
         snap: true,

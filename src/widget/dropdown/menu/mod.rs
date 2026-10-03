@@ -291,6 +291,7 @@ impl<'a, Message: Clone + 'a> Overlay<'a, Message> {
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    ..Default::default()
                 },
                 shadow: Shadow::default(),
                 snap: true,

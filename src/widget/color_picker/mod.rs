@@ -630,6 +630,7 @@ where
                             width: 1.0,
                             color: t.palette.neutral_5.into(),
                             radius: (1.0 + handle_radius).into(),
+                            ..Default::default()
                         },
                         shadow: Shadow::default(),
                         snap: true,
@@ -648,6 +649,7 @@ where
                             width: 1.0,
                             color: t.palette.neutral_10.into(),
                             radius: handle_radius.into(),
+                            ..Default::default()
                         },
                         shadow: Shadow::default(),
                         snap: true,
