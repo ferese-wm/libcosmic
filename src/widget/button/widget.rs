@@ -45,6 +45,7 @@ pub struct Button<'a, Message> {
     #[cfg(feature = "a11y")]
     label: Option<Vec<iced_accessibility::accesskit::NodeId>>,
     content: crate::Element<'a, Message>,
+    image_handle: Option<iced_core::image::Handle>,
     on_press: Option<Box<dyn Fn(Vector, Rectangle) -> Message + 'a>>,
     on_press_down: Option<Box<dyn Fn(Vector, Rectangle) -> Message + 'a>>,
     width: Length,
@@ -68,6 +69,7 @@ impl<'a, Message: Clone + 'a> Button<'a, Message> {
             #[cfg(feature = "a11y")]
             label: None,
             content: content.into(),
+            image_handle: None,
             on_press: None,
             on_press_down: None,
             width: Length::Shrink,
@@ -94,6 +96,7 @@ impl<'a, Message: Clone + 'a> Button<'a, Message> {
             #[cfg(feature = "a11y")]
             label: None,
             content: content.into(),
+            image_handle: None,
             on_press: None,
             on_press_down: None,
             width: Length::Shrink,
@@ -113,6 +116,11 @@ impl<'a, Message: Clone + 'a> Button<'a, Message> {
                     }),
             },
         }
+    }
+
+    pub(super) fn direct_image(mut self, handle: iced_core::image::Handle) -> Self {
+        self.image_handle = Some(handle);
+        self
     }
 
     /// Sets the [`Id`] of the [`Button`].
@@ -507,13 +515,26 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
             text_color.a = alpha;
         }
 
-        draw::<_, crate::Theme>(
+        draw_with_clip::<_, crate::Theme>(
             renderer,
             bounds,
             *viewport,
             &styling,
-            |renderer, _styling| {
-                self.content.as_widget().draw(
+            |renderer, styling| {
+                let direct;
+                let content = if let Some(handle) = &self.image_handle {
+                    let mut image = crate::widget::image(handle.clone())
+                        .border_radius(styling.border_radius)
+                        .shape(styling.shape.unwrap_or_default());
+                    if let Some(outline) = styling.outline {
+                        image = image.outline(outline);
+                    }
+                    direct = crate::Element::from(image);
+                    direct.as_widget()
+                } else {
+                    self.content.as_widget()
+                };
+                content.draw(
                     &tree.children[0],
                     renderer,
                     theme,
@@ -528,6 +549,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                 );
             },
             matches!(self.variant, Variant::Image { .. }),
+            self.image_handle.is_none(),
         );
 
         if let Variant::Image {
@@ -911,8 +933,31 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
 ) where
     Theme: super::style::Catalog,
 {
+    draw_with_clip::<Renderer, Theme>(
+        renderer,
+        bounds,
+        viewport_bounds,
+        styling,
+        draw_contents,
+        is_image,
+        true,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn draw_with_clip<Renderer: iced_core::Renderer, Theme>(
+    renderer: &mut Renderer,
+    bounds: Rectangle,
+    viewport_bounds: Rectangle,
+    styling: &super::style::Style,
+    draw_contents: impl FnOnce(&mut Renderer, &Style),
+    is_image: bool,
+    clip_image: bool,
+) where
+    Theme: super::style::Catalog,
+{
     let draw_contents = |renderer: &mut Renderer, styling: &Style| {
-        if is_image {
+        if is_image && clip_image {
             let border = Border {
                 radius: styling.border_radius,
                 shape: styling.shape.unwrap_or_default(),
