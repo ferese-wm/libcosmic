@@ -740,10 +740,12 @@ where
                         bounds: active_bounds,
                         border: Border {
                             radius: styling.bar_border_radius.into(),
+                            shape: styling.shape.unwrap_or(theme.corner_shape),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     };
 
                     renderer.fill_quad(path_quad, styling.path);

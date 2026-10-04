@@ -48,6 +48,7 @@ pub(crate) static THEME: Mutex<Theme> = Mutex::new(Theme {
     theme_type: ThemeType::Dark,
     layer: cosmic_theme::Layer::Background,
     transparent: false,
+    corner_shape: iced_core::border::Shape::Circular,
     list_item_position: None,
 });
 
@@ -185,11 +186,19 @@ pub struct Theme {
     pub theme_type: ThemeType,
     pub layer: cosmic_theme::Layer,
     pub transparent: bool,
+    /// Default corner profile for built-in widget styles.
+    pub corner_shape: iced_core::border::Shape,
     /// Only meaningful for widgets that must be in a list. Otherwise it should be ignored.
     pub list_item_position: Option<(Alignment, usize)>,
 }
 
 impl Theme {
+    /// Sets the default profile. Custom styles can explicitly choose another shape.
+    pub fn corner_shape(mut self, shape: iced_core::border::Shape) -> Self {
+        self.corner_shape = shape;
+        self
+    }
+
     #[inline]
     pub fn cosmic(&self) -> &cosmic_theme::Theme {
         match self.theme_type {
@@ -292,6 +301,71 @@ impl DefaultStyle for Theme {
             icon_color: cosmic.on_bg_color().into(),
             background_color: cosmic.bg_color().into(),
             text_color: cosmic.on_bg_color().into(),
+        }
+    }
+}
+
+#[cfg(test)]
+mod corner_tests {
+    use super::*;
+    use iced_core::border::Shape;
+
+    #[test]
+    fn built_in_styles_follow_theme_and_custom_styles_keep_overrides() {
+        use crate::widget::button::Catalog as ButtonCatalog;
+        use crate::widget::segmented_button::StyleSheet as SegmentCatalog;
+        use crate::widget::text_input::StyleSheet as InputCatalog;
+        use iced_widget::container::Catalog as ContainerCatalog;
+        use iced_widget::slider::Catalog as SliderCatalog;
+
+        assert_eq!(<Theme as Default>::default().corner_shape, Shape::Circular);
+
+        for shape in [Shape::Continuous, Shape::Circular] {
+            let theme = Theme::dark().corner_shape(shape);
+            let button =
+                ButtonCatalog::active(&theme, false, false, &crate::theme::Button::Standard);
+            assert_eq!(button.shape, Some(shape));
+            assert_eq!(
+                theme.focused(&crate::theme::TextInput::Default).shape,
+                Some(shape)
+            );
+            let container = ContainerCatalog::style(&theme, &crate::theme::Container::Primary);
+            assert_eq!(container.border.shape, shape);
+            let slider = SliderCatalog::style(
+                &theme,
+                &crate::theme::style::iced::Slider::Standard,
+                iced_widget::slider::Status::Active,
+            );
+            assert_eq!(slider.handle.corner_shape, shape);
+            assert_eq!(slider.rail.border.shape, shape);
+
+            for appearance in [
+                theme.horizontal(&crate::theme::SegmentedButton::Control),
+                theme.vertical(&crate::theme::SegmentedButton::Control),
+            ] {
+                assert_eq!(appearance.border.shape, shape);
+                for status in [
+                    appearance.active,
+                    appearance.inactive,
+                    appearance.hover,
+                    appearance.pressed,
+                ] {
+                    for item in [status.first, status.middle, status.last] {
+                        assert_eq!(item.border.shape, shape);
+                    }
+                }
+            }
+
+            let custom = crate::theme::Container::custom(|_| iced_widget::container::Style {
+                border: iced_core::Border::default()
+                    .rounded(12)
+                    .shape(Shape::Circular),
+                ..Default::default()
+            });
+            assert_eq!(
+                ContainerCatalog::style(&theme, &custom).border.shape,
+                Shape::Circular
+            );
         }
     }
 }

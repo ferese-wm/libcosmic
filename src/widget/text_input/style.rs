@@ -10,6 +10,10 @@ use iced_core::{Background, Color};
 /// The appearance of a text input.
 #[derive(Debug, Clone, Copy)]
 pub struct Appearance {
+    /// Corner profile override; None uses the theme preference.
+    pub shape: Option<iced_core::border::Shape>,
+    /// Reference contour for an explicitly concentric surface.
+    pub outline: Option<iced_core::border::Outline>,
     /// The [`Background`] of the text input.
     pub background: Background,
     /// The border radius of the text input.
@@ -36,6 +40,11 @@ pub struct Appearance {
 
 /// A set of rules that dictate the style of a text input.
 pub trait StyleSheet {
+    /// Default corner profile for styles without an explicit override.
+    fn corner_shape(&self) -> iced_core::border::Shape {
+        iced_core::border::Shape::Circular
+    }
+
     /// The supported style of the [`StyleSheet`].
     type Style: Default;
 

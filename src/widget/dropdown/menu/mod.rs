@@ -291,9 +291,12 @@ impl<'a, Message: Clone + 'a> Overlay<'a, Message> {
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or(theme.corner_shape),
+                    ..Default::default()
                 },
                 shadow: Shadow::default(),
                 snap: true,
+                use_contour: false,
             },
             appearance.background,
         );
@@ -619,10 +622,12 @@ where
                         },
                         border: Border {
                             radius: appearance.border_radius,
+                            shape: appearance.shape.unwrap_or(theme.corner_shape),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     appearance.selected_background,
                 );
@@ -654,10 +659,12 @@ where
                         },
                         border: Border {
                             radius: appearance.border_radius,
+                            shape: appearance.shape.unwrap_or(theme.corner_shape),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     appearance.hovered_background,
                 );

@@ -903,6 +903,7 @@ pub fn draw<'a, S>(
             border: style.border,
             shadow: Shadow::default(),
             snap: true,
+            use_contour: false,
         },
         style.background,
     );

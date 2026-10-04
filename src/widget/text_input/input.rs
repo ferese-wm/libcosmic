@@ -2669,6 +2669,8 @@ pub fn draw<'a, Message>(
                 bounds,
                 border: Border {
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or_else(|| theme.corner_shape()),
+                    outline: appearance.outline,
                     width: appearance.border_width,
                     ..Default::default()
                 },
@@ -2678,6 +2680,7 @@ pub fn draw<'a, Message>(
                     blur_radius: 0.0,
                 },
                 snap: true,
+                use_contour: false,
             },
             appearance.background,
         );
@@ -2688,6 +2691,11 @@ pub fn draw<'a, Message>(
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or_else(|| theme.corner_shape()),
+                    outline: appearance
+                        .outline
+                        .and_then(|outline| outline.inset(-f64::from(border_offset))),
+                    ..Default::default()
                 },
                 shadow: Shadow {
                     offset: Vector::new(0.0, 1.0),
@@ -2695,6 +2703,7 @@ pub fn draw<'a, Message>(
                     blur_radius: 0.0,
                 },
                 snap: true,
+                use_contour: false,
             },
             Background::Color(Color::TRANSPARENT),
         );
@@ -2706,6 +2715,9 @@ pub fn draw<'a, Message>(
                     width: appearance.border_width,
                     color: appearance.border_color,
                     radius: appearance.border_radius,
+                    shape: appearance.shape.unwrap_or_else(|| theme.corner_shape()),
+                    outline: appearance.outline,
+                    ..Default::default()
                 },
                 shadow: Shadow {
                     offset: Vector::new(0.0, 1.0),
@@ -2713,6 +2725,7 @@ pub fn draw<'a, Message>(
                     blur_radius: 0.0,
                 },
                 snap: true,
+                use_contour: false,
             },
             appearance.background,
         );
@@ -2812,6 +2825,7 @@ pub fn draw<'a, Message>(
                                     width: 0.0,
                                     color: Color::TRANSPARENT,
                                     radius: radius_0,
+                                    ..Default::default()
                                 },
                                 shadow: Shadow {
                                     offset: Vector::ZERO,
@@ -2819,6 +2833,7 @@ pub fn draw<'a, Message>(
                                     blur_radius: 0.0,
                                 },
                                 snap: true,
+                                use_contour: false,
                             },
                             text_color,
                         )],
@@ -2864,6 +2879,7 @@ pub fn draw<'a, Message>(
                                         width: 0.0,
                                         color: Color::TRANSPARENT,
                                         radius: radius_0,
+                                        ..Default::default()
                                     },
                                     shadow: Shadow {
                                         offset: Vector::ZERO,
@@ -2871,6 +2887,7 @@ pub fn draw<'a, Message>(
                                         blur_radius: 0.0,
                                     },
                                     snap: true,
+                                    use_contour: false,
                                 },
                                 appearance.selected_fill,
                             )

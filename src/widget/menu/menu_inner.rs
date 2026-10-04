@@ -831,11 +831,14 @@ impl<'b, Message: Clone + 'static> Menu<'b, Message> {
                                 ),
                                 border: Border {
                                     radius: styling.menu_border_radius.into(),
+                                    shape: styling.shape.unwrap_or(theme.corner_shape),
                                     width: styling.border_width,
                                     color: styling.border_color,
+                                    ..Default::default()
                                 },
                                 shadow: Shadow::default(),
                                 snap: true,
+                                use_contour: false,
                             };
                             let menu_color = styling.background;
                             r.fill_quad(menu_quad, menu_color);
@@ -866,10 +869,12 @@ impl<'b, Message: Clone + 'static> Menu<'b, Message> {
                                         .unwrap_or_default(),
                                     border: Border {
                                         radius: rad.into(),
+                                        shape: styling.shape.unwrap_or(theme.corner_shape),
                                         ..Default::default()
                                     },
                                     shadow: Shadow::default(),
                                     snap: true,
+                                    use_contour: false,
                                 };
 
                                 r.fill_quad(path_quad, styling.path);

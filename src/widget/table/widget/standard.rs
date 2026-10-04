@@ -184,6 +184,7 @@ where
                                         None
                                     },
                                     border: Border {
+                                        shape: theme.corner_shape,
                                         radius: theme.cosmic().radius_xs().into(),
                                         ..Default::default()
                                     },

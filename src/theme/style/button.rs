@@ -53,6 +53,7 @@ pub fn appearance(
     let cosmic = theme.cosmic();
     let mut corner_radii = &cosmic.corner_radii.radius_xl;
     let mut appearance = Style::new();
+    appearance.shape = Some(theme.corner_shape);
     let hc = theme.theme_type.is_high_contrast();
     match style {
         Button::Standard
@@ -202,6 +203,9 @@ pub fn appearance(
 }
 
 impl Catalog for crate::Theme {
+    fn corner_shape(&self) -> iced_core::border::Shape {
+        self.corner_shape
+    }
     type Class = Button;
 
     fn active(&self, focused: bool, selected: bool, style: &Self::Class) -> Style {

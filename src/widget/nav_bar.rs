@@ -207,9 +207,11 @@ pub fn nav_bar_style(theme: &Theme) -> iced_widget::container::Style {
             cosmic.primary(theme.transparent).base.into(),
         )),
         border: Border {
+            shape: theme.corner_shape,
             width: 0.0,
             color: Color::TRANSPARENT,
             radius: cosmic.corner_radii.radius_s.into(),
+            ..Default::default()
         },
         shadow: Shadow::default(),
         snap: true,

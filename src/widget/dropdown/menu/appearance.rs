@@ -9,6 +9,8 @@ use iced_core::{Background, Color};
 /// The appearance of a menu.
 #[derive(Debug, Clone, Copy)]
 pub struct Appearance {
+    /// Profile override for the menu surface and list items.
+    pub shape: Option<iced_core::border::Shape>,
     /// Menu text color
     pub text_color: Color,
     /// Menu background

@@ -26,6 +26,10 @@ pub enum TextInput {
 }
 
 impl StyleSheet for crate::Theme {
+    fn corner_shape(&self) -> iced_core::border::Shape {
+        self.corner_shape
+    }
+
     type Style = TextInput;
 
     fn active(&self, style: &Self::Style) -> Appearance {
@@ -38,6 +42,8 @@ impl StyleSheet for crate::Theme {
         let label_color = palette.palette.neutral_9;
         match style {
             TextInput::Default => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_s.into(),
                 border_width: 2.0,
@@ -54,6 +60,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::EditableText => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,
@@ -70,6 +78,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::ExpandableSearch => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_xl.into(),
                 border_width: 0.0,
@@ -86,6 +96,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Search => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_xl.into(),
                 border_width: 2.0,
@@ -102,6 +114,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Inline => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,
@@ -133,6 +147,8 @@ impl StyleSheet for crate::Theme {
 
         match style {
             TextInput::Default => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_s.into(),
                 border_width: 2.0,
@@ -149,6 +165,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Search | TextInput::ExpandableSearch => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_xl.into(),
                 border_width: 0.0,
@@ -165,6 +183,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::EditableText | TextInput::Inline => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,
@@ -196,6 +216,8 @@ impl StyleSheet for crate::Theme {
 
         match style {
             TextInput::Default => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_s.into(),
                 border_width: 2.0,
@@ -212,6 +234,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Search => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_xl.into(),
                 border_offset: None,
@@ -228,6 +252,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::ExpandableSearch => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_xl.into(),
                 border_offset: None,
@@ -244,6 +270,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::EditableText => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,
@@ -260,6 +288,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Inline => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::from(container.component.hover).into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,
@@ -291,6 +321,8 @@ impl StyleSheet for crate::Theme {
 
         match style {
             TextInput::Default => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_s.into(),
                 border_width: 2.0,
@@ -307,6 +339,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Search | TextInput::ExpandableSearch => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: background.into(),
                 border_radius: corner.radius_xl.into(),
                 border_width: 2.0,
@@ -323,6 +357,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::EditableText => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,
@@ -339,6 +375,8 @@ impl StyleSheet for crate::Theme {
                 label_color: label_color.into(),
             },
             TextInput::Inline => Appearance {
+                shape: Some(self.corner_shape),
+                outline: None,
                 background: Color::TRANSPARENT.into(),
                 border_radius: corner.radius_0.into(),
                 border_width: 0.0,

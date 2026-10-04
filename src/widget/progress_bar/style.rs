@@ -3,6 +3,7 @@ use palette::WithAlpha;
 
 #[derive(Clone, Copy, Debug)]
 pub struct Style {
+    pub shape: iced_core::border::Shape,
     /// The track [`Color`] of the progress indicator.
     pub track_color: Color,
     /// The bar [`Color`] of the progress indicator.
@@ -16,6 +17,7 @@ pub struct Style {
 /// [`Style`] field overrides
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Class {
+    pub shape: Option<iced_core::border::Shape>,
     pub track_color: Option<Color>,
     pub bar_color: Option<Color>,
     pub border_color: Option<Color>,
@@ -23,6 +25,11 @@ pub struct Class {
 }
 
 impl Class {
+    pub fn shape(mut self, shape: iced_core::border::Shape) -> Self {
+        self.shape = Some(shape);
+        self
+    }
+
     pub fn track_color(mut self, color: impl Into<Color>) -> Self {
         self.track_color = Some(color.into());
         self
@@ -45,6 +52,7 @@ impl Class {
 
     fn resolve(&self, base: Style) -> Style {
         Style {
+            shape: self.shape.unwrap_or(base.shape),
             track_color: self.track_color.unwrap_or(base.track_color),
             bar_color: self.bar_color.unwrap_or(base.bar_color),
             border_color: self.border_color.or(base.border_color),
@@ -68,6 +76,7 @@ impl Catalog for iced::Theme {
     fn style(&self, class: &Self::Class, _is_determinate: bool, _is_circular: bool) -> Style {
         let palette = self.extended_palette();
         class.resolve(Style {
+            shape: iced_core::border::Shape::Circular,
             track_color: palette.background.weak.color,
             bar_color: palette.primary.base.color,
             border_color: None,
@@ -100,6 +109,7 @@ impl Catalog for crate::Theme {
         }
 
         class.resolve(Style {
+            shape: self.corner_shape,
             track_color,
             bar_color,
             border_color: if is_determinate && theme.is_high_contrast {

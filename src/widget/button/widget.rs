@@ -45,6 +45,7 @@ pub struct Button<'a, Message> {
     #[cfg(feature = "a11y")]
     label: Option<Vec<iced_accessibility::accesskit::NodeId>>,
     content: crate::Element<'a, Message>,
+    image_handle: Option<iced_core::image::Handle>,
     on_press: Option<Box<dyn Fn(Vector, Rectangle) -> Message + 'a>>,
     on_press_down: Option<Box<dyn Fn(Vector, Rectangle) -> Message + 'a>>,
     width: Length,
@@ -68,6 +69,7 @@ impl<'a, Message: Clone + 'a> Button<'a, Message> {
             #[cfg(feature = "a11y")]
             label: None,
             content: content.into(),
+            image_handle: None,
             on_press: None,
             on_press_down: None,
             width: Length::Shrink,
@@ -94,6 +96,7 @@ impl<'a, Message: Clone + 'a> Button<'a, Message> {
             #[cfg(feature = "a11y")]
             label: None,
             content: content.into(),
+            image_handle: None,
             on_press: None,
             on_press_down: None,
             width: Length::Shrink,
@@ -113,6 +116,11 @@ impl<'a, Message: Clone + 'a> Button<'a, Message> {
                     }),
             },
         }
+    }
+
+    pub(super) fn direct_image(mut self, handle: iced_core::image::Handle) -> Self {
+        self.image_handle = Some(handle);
+        self
     }
 
     /// Sets the [`Id`] of the [`Button`].
@@ -472,6 +480,8 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
 
             theme.active(state.is_focused, self.selected, &self.style)
         };
+
+        styling.shape = Some(styling.shape.unwrap_or_else(|| theme.corner_shape()));
         if matches!(
             self.style,
             crate::theme::Button::MenuItem | crate::theme::Button::MenuFolder
@@ -505,13 +515,26 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
             text_color.a = alpha;
         }
 
-        draw::<_, crate::Theme>(
+        draw_with_clip::<_, crate::Theme>(
             renderer,
             bounds,
             *viewport,
             &styling,
-            |renderer, _styling| {
-                self.content.as_widget().draw(
+            |renderer, styling| {
+                let direct;
+                let content = if let Some(handle) = &self.image_handle {
+                    let mut image = crate::widget::image(handle.clone())
+                        .border_radius(styling.border_radius)
+                        .shape(styling.shape.unwrap_or_default());
+                    if let Some(outline) = styling.outline {
+                        image = image.outline(outline);
+                    }
+                    direct = crate::Element::from(image);
+                    direct.as_widget()
+                } else {
+                    self.content.as_widget()
+                };
+                content.draw(
                     &tree.children[0],
                     renderer,
                     theme,
@@ -526,6 +549,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                 );
             },
             matches!(self.variant, Variant::Image { .. }),
+            self.image_handle.is_none(),
         );
 
         if let Variant::Image {
@@ -548,6 +572,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                                 y: bounds.y + (bounds.height - 20.0 - styling.border_width),
                             },
                             border: Border {
+                                shape: styling.shape.unwrap_or_default(),
                                 radius: [
                                     c_rad.radius_0[0],
                                     c_rad.radius_s[1],
@@ -559,6 +584,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                             },
                             shadow: Shadow::default(),
                             snap: true,
+                            use_contour: false,
                         },
                         selection_background,
                     );
@@ -586,9 +612,11 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
                                     shadow: Shadow::default(),
                                     border: Border {
                                         radius: c_rad.radius_m.into(),
+                                        shape: styling.shape.unwrap_or_default(),
                                         ..Default::default()
                                     },
                                     snap: true,
+                                    use_contour: false,
                                 },
                                 selection_background,
                             );
@@ -905,6 +933,46 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
 ) where
     Theme: super::style::Catalog,
 {
+    draw_with_clip::<Renderer, Theme>(
+        renderer,
+        bounds,
+        viewport_bounds,
+        styling,
+        draw_contents,
+        is_image,
+        true,
+    );
+}
+
+#[allow(clippy::too_many_arguments)]
+fn draw_with_clip<Renderer: iced_core::Renderer, Theme>(
+    renderer: &mut Renderer,
+    bounds: Rectangle,
+    viewport_bounds: Rectangle,
+    styling: &super::style::Style,
+    draw_contents: impl FnOnce(&mut Renderer, &Style),
+    is_image: bool,
+    clip_image: bool,
+) where
+    Theme: super::style::Catalog,
+{
+    let draw_contents = |renderer: &mut Renderer, styling: &Style| {
+        if is_image && clip_image {
+            let border = Border {
+                radius: styling.border_radius,
+                shape: styling.shape.unwrap_or_default(),
+                outline: styling.outline,
+                ..Default::default()
+            };
+
+            renderer.with_border_layer(bounds, border, true, 0.0, |renderer| {
+                draw_contents(renderer, styling)
+            });
+        } else {
+            draw_contents(renderer, styling);
+        }
+    };
+
     let doubled_border_width = styling.border_width * 2.0;
     let doubled_outline_width = styling.outline_width * 2.0;
 
@@ -921,9 +989,15 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     width: styling.outline_width,
                     color: styling.outline_color,
                     radius: styling.border_radius,
+                    shape: styling.shape.unwrap_or_default(),
+                    outline: styling.outline.and_then(|outline| {
+                        outline.inset(-f64::from(styling.border_width + styling.outline_width))
+                    }),
+                    ..Default::default()
                 },
                 shadow: Shadow::default(),
                 snap: true,
+                use_contour: is_image,
             },
             Color::TRANSPARENT,
         );
@@ -942,10 +1016,21 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     },
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline.and_then(|outline| {
+                            outline.transformed(
+                                [
+                                    styling.shadow_offset.x as f64,
+                                    styling.shadow_offset.y as f64,
+                                ],
+                                1.0,
+                            )
+                        }),
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 Background::Color([0.0, 0.0, 0.0, 0.5].into()),
             );
@@ -958,10 +1043,13 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     bounds,
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 background,
             );
@@ -974,10 +1062,13 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                     bounds,
                     border: Border {
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
                         ..Default::default()
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 overlay,
             );
@@ -999,9 +1090,13 @@ pub fn draw<Renderer: iced_core::Renderer, Theme>(
                         width: styling.border_width,
                         color: styling.border_color,
                         radius: styling.border_radius,
+                        shape: styling.shape.unwrap_or_default(),
+                        outline: styling.outline,
+                        ..Default::default()
                     },
                     shadow: Shadow::default(),
                     snap: true,
+                    use_contour: is_image,
                 },
                 Color::TRANSPARENT,
             );

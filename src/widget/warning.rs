@@ -64,9 +64,11 @@ pub fn warning_container(theme: &Theme) -> widget::container::Style {
         text_color: Some(theme.cosmic().warning.on.into()),
         background: Some(Background::Color(theme.cosmic().warning_color().into())),
         border: Border {
+            shape: theme.corner_shape,
             color: Color::TRANSPARENT,
             width: 1.0,
             radius: cosmic.corner_radii.radius_0.into(),
+            ..Default::default()
         },
         shadow: Shadow {
             color: Color::TRANSPARENT,

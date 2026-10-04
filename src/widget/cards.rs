@@ -437,11 +437,13 @@ where
                     Quad {
                         bounds: layout.bounds(),
                         border: Border {
+                            shape: theme.corner_shape,
                             radius: Radius::from([0.0, 0.0, radius_xs[2], radius_xs[3]]),
                             ..Default::default()
                         },
                         shadow: Shadow::default(),
                         snap: true,
+                        use_contour: false,
                     },
                     if i == 0 {
                         appearance.card_1
