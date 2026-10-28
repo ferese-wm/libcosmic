@@ -389,6 +389,19 @@ where
         clipboard: &mut dyn Clipboard,
         shell: &mut Shell<'_, Message>,
     ) {
+        if matches!(
+            event,
+            event::Event::Keyboard(iced_core::keyboard::Event::KeyPressed {
+                key: iced_core::keyboard::Key::Named(iced_core::keyboard::key::Named::Escape),
+                ..
+            })
+        ) {
+            self.menu.tree.inner.with_data_mut(|state| state.reset());
+            self.widget.set_context_menu_position(self.tree, None);
+            shell.capture_event();
+            shell.request_redraw();
+            return;
+        }
         // Right-clicks are not menu interactions. A right-click *on* the menu
         // (notably the press/release that opened it) is swallowed so it does
         // not close the menu. A right-click *outside* closes it — clearing the
@@ -667,6 +680,30 @@ pub(crate) fn dismiss_popup_on_event(
     }
 }
 
+/// No selection payload means export is forbidden, even if an action is injected
+/// without going through the menu's disabled-item handling.
+fn apply_popup_action(
+    action: TextCtxAction,
+    selected_text: Option<&str>,
+    pending: &PendingAction,
+    clipboard: &mut dyn Clipboard,
+) {
+    match action {
+        TextCtxAction::Copy | TextCtxAction::Cut => {
+            let Some(text) = selected_text else {
+                return;
+            };
+            clipboard.write(clipboard::Kind::Standard, text.to_owned());
+            if matches!(action, TextCtxAction::Cut) {
+                *pending.lock().expect("text menu action lock poisoned") = Some(action);
+            }
+        }
+        TextCtxAction::Paste | TextCtxAction::SelectAll => {
+            *pending.lock().expect("text menu action lock poisoned") = Some(action);
+        }
+    }
+}
+
 /// Widget that wraps [`Menu`] inside a Wayland popup and intercepts
 /// [`TextCtxAction`] messages for clipboard operations.
 #[derive(Clone)]
@@ -818,31 +855,12 @@ impl<Message: Clone + 'static> iced_core::widget::Widget<Message, crate::Theme, 
         }
 
         for action in local_messages {
-            match action {
-                TextCtxAction::Copy => {
-                    if let Some(ref text) = self.selected_text {
-                        clipboard.write(clipboard::Kind::Standard, text.clone());
-                    }
-                }
-                TextCtxAction::Cut => {
-                    if let Some(ref text) = self.selected_text {
-                        clipboard.write(clipboard::Kind::Standard, text.clone());
-                    }
-                    if let Ok(mut guard) = self.pending_action.lock() {
-                        *guard = Some(TextCtxAction::Cut);
-                    }
-                }
-                TextCtxAction::Paste => {
-                    if let Ok(mut guard) = self.pending_action.lock() {
-                        *guard = Some(TextCtxAction::Paste);
-                    }
-                }
-                TextCtxAction::SelectAll => {
-                    if let Ok(mut guard) = self.pending_action.lock() {
-                        *guard = Some(TextCtxAction::SelectAll);
-                    }
-                }
-            }
+            apply_popup_action(
+                action,
+                self.selected_text.as_deref(),
+                &self.pending_action,
+                clipboard,
+            );
         }
 
         // Under the popup grab the parent widget receives no events, so the
@@ -883,5 +901,34 @@ impl<Message: Clone + 'static> From<TextContextMenuPopup<Message>>
 {
     fn from(popup: TextContextMenuPopup<Message>) -> Self {
         Self::new(popup)
+    }
+}
+
+#[cfg(test)]
+mod secure_menu_tests {
+    use super::*;
+    struct ClipboardMemory(String);
+    impl Clipboard for ClipboardMemory {
+        fn read(&self, _: clipboard::Kind) -> Option<String> {
+            Some(self.0.clone())
+        }
+        fn write(&mut self, _: clipboard::Kind, value: String) {
+            self.0 = value;
+        }
+    }
+    #[test]
+    fn native_actions_without_exportable_selection_keep_clipboard_untouched() {
+        let mut clipboard = ClipboardMemory("sentinel".into());
+        let pending = std::sync::Arc::new(std::sync::Mutex::new(None));
+        for action in [TextCtxAction::Copy, TextCtxAction::Cut] {
+            apply_popup_action(action, None, &pending, &mut clipboard);
+            assert_eq!(clipboard.0, "sentinel");
+            assert!(take_pending_action(&pending).is_none());
+        }
+        apply_popup_action(TextCtxAction::Paste, None, &pending, &mut clipboard);
+        assert!(matches!(
+            take_pending_action(&pending),
+            Some(TextCtxAction::Paste)
+        ));
     }
 }

@@ -201,6 +201,7 @@ pub struct TextInput<'a, Message> {
     error: Option<Cow<'a, str>>,
     on_focus: Option<Message>,
     on_unfocus: Option<Message>,
+    on_escape: Option<Message>,
     on_input: Option<Box<dyn Fn(String) -> Message + 'a>>,
     on_paste: Option<Box<dyn Fn(String) -> Message + 'a>>,
     on_tab: Option<Message>,
@@ -251,6 +252,7 @@ where
             helper_line_height: text::LineHeight::Absolute(14.0.into()),
             on_focus: None,
             on_unfocus: None,
+            on_escape: None,
             on_input: None,
             on_paste: None,
             on_submit: None,
@@ -375,6 +377,12 @@ where
     #[inline]
     pub fn on_unfocus(mut self, on_unfocus: Message) -> Self {
         self.on_unfocus = Some(on_unfocus);
+        self
+    }
+
+    /// Handles Escape after any open context menu has been dismissed.
+    pub fn on_escape(mut self, message: Message) -> Self {
+        self.on_escape = Some(message);
         self
     }
 
@@ -840,6 +848,46 @@ where
         }
     }
 
+    #[cfg(feature = "a11y")]
+    fn a11y_nodes(
+        &self,
+        layout: Layout<'_>,
+        tree: &Tree,
+        _: mouse::Cursor,
+    ) -> iced_accessibility::A11yTree {
+        use iced_accessibility::accesskit::{Action, Node, Rect, Role};
+        let state = tree.state.downcast_ref::<State>();
+        let secure = self.is_secure || state.is_secure;
+        let mut node = Node::new(if secure {
+            Role::PasswordInput
+        } else {
+            Role::TextInput
+        });
+        node.set_label(self.label.as_deref().unwrap_or(&self.placeholder));
+        let bounds = layout.bounds();
+        node.set_bounds(Rect::new(
+            bounds.x.into(),
+            bounds.y.into(),
+            (bounds.x + bounds.width).into(),
+            (bounds.y + bounds.height).into(),
+        ));
+        if self.on_input.is_none() && !self.manage_value {
+            node.set_disabled();
+        } else {
+            node.add_action(Action::Focus);
+            if self.is_read_only {
+                node.set_read_only();
+            } else {
+                node.add_action(Action::SetValue);
+            }
+        }
+        // Protected fields expose neither their value nor text children/selection ranges.
+        if !secure {
+            node.set_value(state.tracked_value.to_string());
+        }
+        iced_accessibility::A11yTree::leaf(node, self.id.clone())
+    }
+
     fn operate(
         &mut self,
         tree: &mut Tree,
@@ -921,6 +969,24 @@ where
         shell: &mut Shell<'_, Message>,
         viewport: &Rectangle,
     ) {
+        let escape = matches!(
+            event,
+            Event::Keyboard(keyboard::Event::KeyPressed {
+                key: keyboard::Key::Named(keyboard::key::Named::Escape),
+                ..
+            })
+        );
+        let menu_open = tree
+            .state
+            .downcast_ref::<State>()
+            .context_menu_position
+            .is_some()
+            || tree
+                .state
+                .downcast_ref::<State>()
+                .menu_bar_state
+                .inner
+                .with_data(|state| state.open);
         #[cfg(all(wayland_platform, feature = "winit"))]
         if self.uses_popup_context_menu() {
             let menu_bar_state = tree.state.downcast_ref::<State>().menu_bar_state.clone();
@@ -929,6 +995,53 @@ where
                 event,
                 self.window_id,
             );
+        }
+
+        if escape && menu_open {
+            let state = tree.state.downcast_mut::<State>();
+            state.context_menu_position = None;
+            state
+                .menu_bar_state
+                .inner
+                .with_data_mut(|state| state.reset());
+            shell.capture_event();
+            shell.request_redraw();
+            return;
+        }
+        if escape && tree.state.downcast_ref::<State>().is_focused() {
+            if let Some(message) = &self.on_escape {
+                shell.publish(message.clone());
+                shell.capture_event();
+                return;
+            }
+        }
+
+        #[cfg(feature = "a11y")]
+        if let Event::A11y(id, request) = event {
+            use iced_accessibility::accesskit::{Action, ActionData};
+            if *id == self.id && (self.on_input.is_some() || self.manage_value) {
+                let state = tree.state.downcast_mut::<State>();
+                match (&request.action, &request.data) {
+                    (Action::Focus, _) => {
+                        operation::Focusable::focus(state);
+                        shell.capture_event();
+                        shell.request_redraw();
+                    }
+                    (Action::SetValue, Some(ActionData::Value(value))) if !self.is_read_only => {
+                        state.select_all();
+                        let filtered: String = value.chars().filter(|c| !c.is_control()).collect();
+                        let contents = state.paste_text(&filtered);
+                        self.value = state.tracked_value.clone();
+                        if let Some(on_input) = &self.on_input {
+                            shell.publish(on_input(contents));
+                        }
+                        shell.capture_event();
+                        shell.invalidate_layout();
+                    }
+                    _ => {}
+                }
+                return;
+            }
         }
 
         let text_layout = self.text_layout(layout);
@@ -1049,10 +1162,9 @@ where
         ) {
             let state = tree.state.downcast_ref::<State>();
             if state.context_menu_position.is_some() {
-                let selected_text = state
-                    .cursor()
-                    .selection(&state.tracked_value)
-                    .map(|(start, end)| state.tracked_value.select(start, end).to_string());
+                // The same export policy applies to native and overlay menus.
+                let selected_text =
+                    iced_core::widget::text::HasSelectableText::selected_text(self, tree);
                 let has_selection = selected_text.is_some();
                 let has_text = !state.tracked_value.is_empty();
                 let clipboard_has_text = state.clipboard_has_text;
@@ -1063,7 +1175,7 @@ where
                 crate::widget::text_context_menu::create_text_context_popup(
                     click_position,
                     selected_text,
-                    true,
+                    iced_core::widget::text::HasSelectableText::is_editable(self),
                     has_selection,
                     has_text,
                     clipboard_has_text,
@@ -1089,12 +1201,22 @@ where
                 match action {
                     crate::widget::text_context_menu::TextCtxAction::Copy => {}
                     crate::widget::text_context_menu::TextCtxAction::Cut => {
+                        if self.is_secure
+                            || state.is_secure
+                            || self.is_read_only
+                            || (self.on_input.is_none() && !self.manage_value)
+                        {
+                            return;
+                        }
                         let contents = state.delete_selection();
                         if let Some(on_input) = self.on_input.as_deref() {
                             shell.publish((on_input)(contents));
                         }
                     }
                     crate::widget::text_context_menu::TextCtxAction::Paste => {
+                        if self.is_read_only || (self.on_input.is_none() && !self.manage_value) {
+                            return;
+                        }
                         let content: String = clipboard
                             .read(iced_core::clipboard::Kind::Standard)
                             .unwrap_or_default();
@@ -3568,6 +3690,9 @@ impl<Message: Clone + 'static> iced_core::widget::text::HasSelectableText
 {
     fn selected_text(&self, tree: &WidgetTree) -> Option<String> {
         let state = tree.state.downcast_ref::<State>();
+        if self.is_secure || state.is_secure {
+            return None;
+        }
         let (start, end) = state.cursor().selection(&state.tracked_value)?;
         Some(state.tracked_value.select(start, end).to_string())
     }
@@ -3578,7 +3703,7 @@ impl<Message: Clone + 'static> iced_core::widget::text::HasSelectableText
     }
 
     fn is_editable(&self) -> bool {
-        true
+        !self.is_read_only && (self.on_input.is_some() || self.manage_value)
     }
 
     fn has_text(&self, tree: &WidgetTree) -> bool {
@@ -3603,10 +3728,16 @@ impl<Message: Clone + 'static> iced_core::widget::text::HasSelectableText
 
     fn delete_selection(&self, tree: &mut WidgetTree) -> Option<String> {
         let state = tree.state.downcast_mut::<State>();
+        if self.is_secure || state.is_secure || !self.is_editable() {
+            return None;
+        }
         Some(state.delete_selection())
     }
 
     fn paste_text(&self, tree: &mut WidgetTree, text: &str) -> Option<String> {
+        if !self.is_editable() {
+            return None;
+        }
         let filtered: String = text.chars().filter(|c| !c.is_control()).collect();
         let state = tree.state.downcast_mut::<State>();
         Some(state.paste_text(&filtered))
