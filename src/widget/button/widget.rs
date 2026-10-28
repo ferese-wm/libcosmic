@@ -712,8 +712,11 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
         let is_hovered = state.state.downcast_ref::<State>().is_hovered;
 
         let mut node = Node::new(Role::Button);
-        node.add_action(Action::Focus);
-        node.add_action(Action::Click);
+        if self.on_press.is_some() || self.on_press_down.is_some() {
+            node.add_action(Action::Focus);
+            node.add_action(Action::Click);
+        }
+        node.set_selected(self.selected);
         node.set_bounds(bounds);
         if let Some(name) = self.name.as_ref() {
             node.set_label(name.clone());
@@ -732,7 +735,7 @@ impl<'a, Message: 'a + Clone> Widget<Message, crate::Theme, crate::Renderer>
             node.set_labelled_by(label.clone());
         }
 
-        if self.on_press.is_none() {
+        if self.on_press.is_none() && self.on_press_down.is_none() {
             node.set_disabled();
         }
         // TODO hover
@@ -874,16 +877,22 @@ pub fn update<'a, Message: Clone>(
         }
         #[cfg(feature = "a11y")]
         Event::A11y(event_id, iced_accessibility::accesskit::ActionRequest { action, .. }) => {
-            let state = state();
-            if let Some(on_press) = matches!(action, iced_accessibility::accesskit::Action::Click)
-                .then_some(on_press)
-                .flatten()
-            {
-                state.is_pressed = false;
-                let msg = (on_press)(layout.virtual_offset(), layout.bounds());
-
-                shell.publish(msg);
+            use iced_accessibility::{IdEq, accesskit::Action};
+            if !IdEq::eq(&_id, event_id) || (on_press.is_none() && on_press_down.is_none()) {
+                return;
             }
+            match action {
+                Action::Click => {
+                    let state = state();
+                    state.is_pressed = false;
+                    if let Some(press) = on_press.or(on_press_down) {
+                        shell.publish(press(layout.virtual_offset(), layout.bounds()));
+                    }
+                }
+                Action::Focus => state().focus(),
+                _ => return,
+            }
+            shell.request_redraw();
             shell.capture_event();
             return;
         }
@@ -1173,5 +1182,99 @@ fn removal_bounds(bounds: Rectangle, offset: f32) -> Rectangle {
         y: bounds.y - 12.0 + offset,
         width: 24.0,
         height: 24.0,
+    }
+}
+
+#[cfg(all(test, feature = "a11y"))]
+mod tests {
+    use super::*;
+    use iced_accessibility::accesskit::{Action, ActionRequest, NodeId, TreeId};
+
+    fn action(id: &Id, action: Action) -> Event {
+        Event::A11y(
+            id.clone(),
+            ActionRequest {
+                action,
+                target_tree: TreeId::ROOT,
+                target_node: NodeId(id.clone().into()),
+                data: None,
+            },
+        )
+    }
+
+    #[test]
+    fn accessibility_click_reaches_only_the_addressed_button() {
+        let first = Id::unique();
+        let second = Id::unique();
+        let node = iced_core::layout::Node::new(iced_core::Size::new(100., 40.));
+        let mut messages = Vec::new();
+        let mut shell = Shell::new(&mut messages);
+        for (id, label) in [(first, "first"), (second.clone(), "second")] {
+            let mut state = State::default();
+            update(
+                id,
+                &action(&second, Action::Click),
+                Layout::new(&node),
+                mouse::Cursor::Unavailable,
+                &mut shell,
+                Some(&|_, _| label),
+                None,
+                || &mut state,
+            );
+            if shell.is_event_captured() {
+                break;
+            }
+        }
+        assert_eq!(messages, ["second"]);
+    }
+
+    #[test]
+    fn accessibility_focus_is_targeted_and_unhandled_actions_propagate() {
+        let id = Id::unique();
+        let node = iced_core::layout::Node::new(iced_core::Size::new(100., 40.));
+        for (target, action, enabled, captured) in [
+            (Id::unique(), Action::Focus, true, false),
+            (id.clone(), Action::Focus, true, true),
+            (id.clone(), Action::Click, false, false),
+            (id.clone(), Action::Focus, false, false),
+            (id.clone(), Action::ScrollDown, true, false),
+        ] {
+            let mut state = State::default();
+            let mut messages = Vec::new();
+            let mut shell = Shell::new(&mut messages);
+            let press = |_, _| ();
+            update(
+                id.clone(),
+                &self::action(&target, action),
+                Layout::new(&node),
+                mouse::Cursor::Unavailable,
+                &mut shell,
+                enabled.then_some(&press),
+                None,
+                || &mut state,
+            );
+            assert_eq!(shell.is_event_captured(), captured);
+            assert_eq!(state.is_focused, captured && action == Action::Focus);
+            assert!(messages.is_empty());
+        }
+    }
+
+    #[test]
+    fn accessibility_click_supports_press_down_buttons() {
+        let id = Id::unique();
+        let node = iced_core::layout::Node::new(iced_core::Size::new(100., 40.));
+        let mut state = State::default();
+        let mut messages = Vec::new();
+        update(
+            id.clone(),
+            &action(&id, Action::Click),
+            Layout::new(&node),
+            mouse::Cursor::Unavailable,
+            &mut Shell::new(&mut messages),
+            None,
+            Some(&|_, _| "pressed"),
+            || &mut state,
+        );
+        assert_eq!(messages, ["pressed"]);
     }
 }
